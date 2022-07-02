@@ -81,8 +81,22 @@
   输入完整路径如`cd D:/project/`或逐个输入如`cd D;cd project`
 
 * 创建一个版本库
-  在某个文件夹中输入`git init`,该文件夹就成为了一个版本库。
+  在某个文件夹中输入`git init`,该文件夹就成为了一个本地仓库。
+
+* 远程仓库
+
+  连接某个远程仓库：`git remote add 远程仓库名字 远程仓库地址`
+  查看已连接的远程仓库：`git remote -v`
+  移除连接：`git remote remove 远程仓库名字`
 
 * 上传文件
+  将某个文件加到缓冲区：`git add 文件名.文件类型`
+  将所有文件加到缓冲区：`git add -A`
+  添加注释：`git commit -m "注释内容"`
+  将文件上传（push）到远程仓库：`git push -u 远程仓库名字 远程仓库分支`
+  修改注释：`git commit --amend -m "注释内容"`
 
-  
+* 查看修改日志：`git log`
+* 下载文件
+  从已连接的远程仓库下载：`git pull 远程仓库名字 远程仓库分支`
+  从任意仓库下载：`git clone 仓库地址`
