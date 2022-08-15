@@ -176,7 +176,7 @@ b = b - alpha * db
 
 ![](pictures\单隐层神经网络.png)
 
-		### 符号说明与正向传播
+### 符号说明与正向传播
 
 $a^{[i]}$ 代表第 $i$ 层神经网络神经元的值，在本例中第 0 层为输入层，第 1 层为隐藏层， 第 2 层位输出层。
 
@@ -186,7 +186,7 @@ $X$ 为网络输入，$X = a^{[0]}$
 
 $Y$ 为网络输出， $Y = a^{[2]}$
 
-则神经网络正向传播过程为：
+则神经网络**正向传播**过程为：
 $$
 \begin{cases}
 Z^{[1]} = W^{[1]}A^{[0]} + b^{[1]} \\
@@ -238,3 +238,99 @@ dW_1 = 1 / m * np.dot(dZ_1, X.T)								# n_1 * n_0
 db_1 = 1 / m * np.sum(dZ_1, axis = 1, keepdims = Ture)			# n_1 * 1	
 ```
 
+# Day 3 多层神经网络架构
+
+## 一，前向传播公式
+
+​		符号定义与前述相同，大写即代表向量化的表示。
+$$
+\begin{cases}
+Z^{[l]} = W^{[l]}A^{[l-1]} + b^{[l]}\\
+A^{[l]} = g^{[l]}(Z^{[l]})
+\end{cases}
+$$
+
+## 二，反向传播公式
+
+​		$L$ 代表神经网络层数，其中输入层为**第0层**。公式如下（使用python语言描述部分矩阵运算）：
+$$
+\begin{cases}
+\mathrm{d}Z^{[l]} = \mathrm{d}A^{[l]} * g^{[l]^{'}}(Z^{[l]}) \\
+\mathrm{d}W^{[l]} = \mathrm{d}Z^{[l]}A^{[l-1]^{T}}/m         \\
+\mathrm{d}b^{[l]} = \mathrm{np.sum}(\mathrm{d}Z^{[l]}, \mathrm{axis = 1}, \mathrm{keepdims = ture})/m \\
+\mathrm{d}A^{[l-1]} = W^{[l]^{T}}\mathrm{d}Z^{[l]}
+\end{cases}
+$$
+​		其中 $\mathrm{d}A^{[L]}$ 由损失函数 $\mathcal{L}(\hat{y}, y)$ 给出。
+
+## 三，神经网络架构图
+
+​		以二分类问题的深度学习网络为例，如下图所示，前 $L-1$ 层激活函数为 $ReLU$ ，第 $L$ 层激活函数为 $Sigmoid$ 。
+
+![](pictures\final outline.png)
+
+# Day4 $Pandas$数据导入
+
+## 一，$Pandas$ 基础
+
+​       常用的 $Pandas$ 数据结构之一是 $DataFrame$ 。DataFrame 是一个表格型的数据结构，它含有一组有序的列，每列可以是不同的值类型（数值、字符串、布尔型值）。
+
+​		$DataFrame$ 的构造方法：`pandas.DataFrame(data, index, columns, dtype, copy)`
+
+​		参数说明：
+
+- `data` : 一组数据，可以是dict，lists等等
+- `index` : 行标签，默认为 0，1，2 ···
+- `columns` : 列标签，默认为 0，1，2 ···
+- `dtype` : 数据类型，如float
+- `copy` : 从输入处拷贝数据，默认为false		
+
+​		使用 `loc` 指令返回指定行数据：
+
+- `df.loc[0]` : 返回第一行
+- `df.loc[[0,1]]` : 返回第一与第二行
+
+​		使用 `read_csv` 读取CSV文件数据，`head(n)` 返回前n行数据，`tail(n)` 返回后n行数据， `info()` 返回基本信息。 `read_csv` 包含参数 `na_values` ，用来指定空数据的类型，例如 `na_values = ["na", "--"]` 。
+
+## 二，$Pandas$ 数据清洗
+
+1. **删除包含空字段的行**
+
+​	`DataFrame.dropna(axis=0, how='any', thresh=None, subset=None, inplace=False)`
+
+​		参数说明：
+
+- `axis`：默认为 **0**，表示逢空值剔除整行，如果设置参数 **axis＝1** 表示逢空值去掉整列。
+- `how`：默认为 **'any'** 如果一行（或一列）里任何一个数据有出现 NA 就去掉整行，如果设置 **how='all'** 一行（或列）都是 NA 才去掉这整行。
+- `thresh`：设置需要多少非空值的数据才可以保留下来的。
+- `subset`：设置想要检查的列。如果是多个列，可以使用列名的 list 作为参数。
+- `inplace`：如果设置 True，将计算得到的值直接覆盖之前的值并返回 None，修改的是源数据。
+
+​	2.**替换空行数据**
+
+​	`df["ST_NUM"].fillna(df["ST_NUM"].mean(), inplace = True)`		
+
+​		上述代码将 `ST_NUM` 列的空数据用该列的平均值替代，且会修改源数据。此外还可使用 `median()` ， `mode()`，`std()` 计算响应的统计参数。
+
+​	3.**清楚重复数据**
+
+​	`drop_duplicates()` 剔除重复数据。 
+
+# Day5  机器学习基础
+
+## 一、方差与偏差
+
+1. 训练集的高误差——高偏差（欠拟合），可以通过增加网络规模、增加训练时间等方法改进。
+2. 测试集的高误差——高方差（过拟合），可以通过增加数据量，对数据正则化等方法改进。
+
+## 二、正则化
+
+​			多层深度学习网络，通过在成本函数中加入正则化项来实现正则化，以下使用 $Frobenius$ $Norm$ 实现正则化。
+$$
+\mathcal{J}(W,b) = \frac{1}{m}\sum_{i=1}^{m}\mathcal{J}(\hat{y}^{(i)},y^{(i)}) + \frac{\lambda}{2m}\sum_{l=1}^{L}||w^{[l]}||^{2}
+$$
+其中 $\frac{\lambda}{2m}\sum_{l=1}^{L}||w^{[l]}||^{2}$ 为 $Frobenius$ $Norm$ ，是每一项的平方和。
+
+​		通过正则化，可以在每次迭代过程中减小 $w$ 的值，因为更新过程变为  $w^{[l]} = (1-\frac{\lambda}{m})*w^{[l]}-\alpha*\mathrm{d}w^{[l]}$ 。
+
+​		而减小 $w$ 的值便意味着神经元的影响变小，从而使得网络在实际意义上更稀疏，一定程度上避免了过拟合的出现。
