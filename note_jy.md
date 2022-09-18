@@ -1,4 +1,4 @@
-# Day 1（基础语法学习）
+# Part 1（基础语法学习）
 
 ## 一、Markdown基础语法
 
@@ -112,7 +112,7 @@
 
 
 
-# Day 2  $Logistic$ 回归与神经网络学习
+# Part 2  $Logistic$ 回归与神经网络学习
 
 ## 一、$Logistic$ 回归
 
@@ -238,7 +238,7 @@ dW_1 = 1 / m * np.dot(dZ_1, X.T)								# n_1 * n_0
 db_1 = 1 / m * np.sum(dZ_1, axis = 1, keepdims = Ture)			# n_1 * 1	
 ```
 
-# Day 3 多层神经网络架构
+# Part 3 多层神经网络架构
 
 ## 一，前向传播公式
 
@@ -269,7 +269,7 @@ $$
 
 ![](pictures\final outline.png)
 
-# Day4 $Pandas$数据导入
+# Part4 $Pandas$数据导入
 
 ## 一，$Pandas$ 基础
 
@@ -316,7 +316,7 @@ $$
 
 ​	`drop_duplicates()` 剔除重复数据。 
 
-# Day5  机器学习基础
+# Part5  机器学习基础
 
 ## 一、方差与偏差
 
@@ -335,7 +335,7 @@ $$
 
 ​		而减小 $w$ 的值便意味着神经元的影响变小，从而使得网络在实际意义上更稀疏，一定程度上避免了过拟合的出现。
 
-### 三、Dropout及其他正则化方法
+## 三、Dropout及其他正则化方法
 
 ​		*inverted dropout* 方法指的是在前向传播的过程中，对每一层神经网络的神经元随机失活。例如对某一层而言，设定一个 *keep-prop* （由专门的布尔矩阵负责，按该概率生成布尔型数据）假设为80%，20个中有4个神经元失活，该神经元对应的 *a* 值置为零，同时在求取下一层的 *z* 值时，为了保持期望不变，对 $W*A$ 的部分除以 *keep-prop* 。
 
@@ -347,7 +347,7 @@ $$
 
 ​		除此之外，还有通过数据集变形来短时间扩充数据集、提前停止网络迭代避免 *W* 参数过大等方法。
 
-### 四、归一化数据
+## 四、归一化数据
 
 ​		为了保证梯度下降算法中下降速率均匀，可以以较大步长下降，需要将数据集做归一化处理。
 
@@ -355,3 +355,56 @@ $$
 $$
 x^{\star} = \frac{x-\mu}{\sqrt{\sigma}}
 $$
+
+## 五、初始化数据
+
+​		为了避免深度网络层数上涨带来的梯度爆炸或梯度消失问题，改变初始化 $W$ 参数时的方法。该问题产生是由于在层数增加带来 $\hat{y}$ 的值指数变化，故在初始化 $W$ 的时，减小其方差来避免该问题**过快出现**。
+
+​		根据经验而定，在激活函数为 *ReLu* 时，将 $W$ 方差控制在 $\frac{2}{n^{l-1}}$ 。而激活函数为 *tanh* 时， 控制在 $\frac{1}{n^{l-1}}$ 。
+
+## 六、梯度检验
+
+​		使用梯度检验进行DEBUG。检验的本质是导数值的数值估计，采用双边公差的方式实现。估计 $f^{’}(\theta)$ 的公式如下：
+$$
+\frac{f(\theta+\epsilon)-f(\theta-\epsilon)}{2\epsilon}
+$$
+误差将控制在 $O(\epsilon^{2})$ 。将上述检验方法应用于深度网络的 *Backprop* 当中时，首先将 $W^{[i]}$， $b^{[i]}$ （$i$ 从$1$到$L$）,化为一个总的向量 $\theta$ ，将 $\mathrm{d}W^{[i]}$， $\mathrm{d}b^{[i]}$ （$i$ 从$1$到$L$）,化为一个总的向量 $\mathrm{d}\theta$ 。 $\theta$ 的每一项是一个参数 $w$ 或 $b$ 。之后对每一项计算：
+$$
+\mathrm{d}\theta_{approx}^{[i]} = \frac{\mathcal{J}(\theta_{1},\theta_{2},···,\theta_{i}+\epsilon,···)-\mathcal{J}（\theta_{1},\theta_{2},···,\theta_{i}-\epsilon,···)}{2\epsilon}
+$$
+检验值为：
+$$
+\frac{||\mathrm{d}\theta_{approx}-\mathrm{d}\theta||_{2}}{||\mathrm{d}\theta_{approx}||_{2}+||\mathrm{d}\theta||_{2}}
+$$
+若检验值在 $10^{-7}$ 数量级，则可认为当前 *Backprop* 没有差错。
+
+​		注意事项：
+
+- 不要在训练网络的过程中使用梯检验，只在DEBUG中使用。
+- cost function $\mathcal{J}(\theta)$ 要进行正则化。
+- 不可以和 *Dropout* 一并使用。
+- 在初始化参数后的第一次迭代使用梯度检验，可能由于参数本身较小不出现显著差错；可以在几轮迭代过后，当参数值增大后，再次进行梯度检验。
+
+# Part6 Mediapipe模型
+
+​		这一部分介绍，如何使用开源Mediapipe模型实现人体姿态的检测，使用Python环境实现。
+
+## 一、模型的输入参数
+
+​		参考 [Python_API]([Pose - mediapipe (google.github.io)](https://google.github.io/mediapipe/solutions/pose#python-solution-api))，模型有如下输入参数：
+
+- `STATIC_IMAGE_MODE`：如果设置为 false，该解决方案会将输入图像视为视频流。它将尝试在第一张图像中检测最突出的人（人员检测），并在成功检测后进一步定位姿态关键点坐标。在随后的图像中，它只是简单地跟踪那些关键点坐标，而调用另一个检测，直到它失去跟踪，可以减少计算和延迟。如果设置为 true，则对每次输入的图像都会进行一次人员检测，非常适合处理一批静态的、可能不相关的图像。默认为false。
+- `MODEL_COMPLEXITY`：模型的复杂度：0、1 或 2。姿态关键点坐标的准确度和计算延迟通常随着模型复杂度的增加而增加。默认为 1。
+- `SMOOTH_LANDMARKS`：如果设置为true，将会过滤不同的输入图像上的姿态关键点坐标以减少抖动，但如果static_image_mode也设置为true则忽略。默认为true。
+- `UPPER_BODY_ONLY`：是要追踪33个姿态关键点坐标还是只有25个姿态关键点坐标。
+- `ENABLE_SEGMENTATION`：如果设置为 true，除了姿态关键点坐标之外，还会生成人物分割蒙版。默认为false。
+- `SMOOTH_SEGMENTATION`：如果设置为true，将会过滤不同的输入图像上的人物分割蒙版以减少抖动，但如果 enable_segmentation设置为false或者static_image_mode设置为true则忽略。默认为true。
+- `MIN_DETECTION_CONFIDENCE`：来自人员检测模型的最小置信度 ([0.0, 1.0])，即将检测视为成功的概率。默认为 0.5。
+- `MIN_TRACKING_CONFIDENCE`：来自姿态关键点跟踪模型的最小置信值 ([0.0, 1.0])，用于判断关键点坐标是否追踪成功。若未追踪成功，则将在下一个输入图像上自动调用人物检测。将其设置为更高的值可以提高稳健性，但会有更高的延迟。如果 static_image_mode 为 true，则忽略，人员检测在每个图像上运行。默认为 0.5。
+
+## 二、参考代码
+
+使用Holistic模型完成图片与视频检测的[代码](https://zhuanlan.zhihu.com/p/353861059)。
+
+使用Pose模型完成视频检测的[代码](https://blog.csdn.net/weixin_43229348/article/details/120541448)。
+
