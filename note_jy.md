@@ -77,7 +77,9 @@
   - 提交所有变化：`git add -A`
   - 提交被修改与被删除的文件，不包括新文件： `git add -u`
   - 提交新文件和被修改的文件，不包括删除（常用）： `git add .`
+- 将文件从暂存区删除：`git checkout 文件名.文件类型`
 - 将暂存区文件提交：`git commit -m "注释"`
+- 查看提交记录：`git log`
 - 查看提交文件与仓库文件的差异：`git diff 文件名.文件类型`
 
 - 将文件同步到远端仓库：`git push`
@@ -102,7 +104,7 @@
 
 - 切换到某个分支：`git checkout <name>`
 
-  - 切换后，可将dev分支合并到master分支，并不影响dev分支的开发：
+  - 切换后，可将dev分支合并到master分支（我现在在master分支），并不影响dev分支的开发：
 
     `git merge dev`
 
