@@ -94,6 +94,10 @@
 
 - 查看远端所有分支：`git branch -r`
 
+- 查看本地分支与远程分支的关系：`git branch -vv`
+
+- 关联指定本地分支到指定远程分支： `git push --set-upstream origin <本地分支名>:<远程分支名>` （要求远程分支已经存在）
+
 - 新建分支：`git branch <name>`
 
 - 删除本地分支：`git branch -d <name>`
